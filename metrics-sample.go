@@ -268,7 +268,7 @@ func getMetrics() {
 func addIn(metrics map[string]SimpleStat, fieldname string, metric string) map[string]SimpleStat {
 	client := http.Client{}
 	prometheusurl := os.Getenv("PROMETHEUS_URL")
-	req, err := http.NewRequest("GET", prometheusurl+"/api/v1/query?query=sum+by(pod_name,namespace,container_name)("+metric+"{container_name!=\"POD\",container_name!=\"\",namespace!=\"kube-system\",job=\"kubernetes-cadvisors\"})", nil)
+	req, err := http.NewRequest("GET", prometheusurl+"/api/v1/query?query=sum+by(pod_name,namespace,container_name)("+metric+"{container_name!=\"POD\",container_name!=\"\",namespace!=\"kube-system\",job=\"kubernetes-nodes-cadvisor\"})", nil)
 	if err != nil {
 		fmt.Println("error creating request")
 		return nil
@@ -340,6 +340,7 @@ func postMemorySample(simplestat SimpleStat) {
 	logentry.Kubernetes.Labels.Name = simplestat.ContainerName
 	logentry.Topic = simplestat.Namespace
 	logentry.Tag = "metrics"
+        logentry.Time = time.Now().UTC()
 	str, err := json.Marshal(logentry)
 	if err != nil {
 		fmt.Println("Error preparing request")
