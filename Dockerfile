@@ -12,6 +12,3 @@ RUN chmod +x /build.sh
 RUN /build.sh
 CMD ["crond", "-f"]
 
-
-
-
