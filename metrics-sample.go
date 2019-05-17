@@ -126,7 +126,6 @@ func main() {
 		time.Sleep(time.Duration(delay) * time.Minute)
 		getMetrics()
 	}
-	fmt.Println("done")
 }
 
 func populatePlanLimits() {
@@ -145,7 +144,6 @@ func populatePlanLimits() {
 	}
 	defer resp.Body.Close()
 	bb, _ := ioutil.ReadAll(resp.Body)
-	fmt.Println(string(bb))
 	err = json.Unmarshal(bb, &plans)
 	if err != nil {
 		fmt.Println(err)
@@ -158,26 +156,20 @@ func populatePlanLimits() {
 		}
 		planlimits[element.Name] = f
 	}
-	fmt.Println(planlimits)
 }
 
 func populateLimits() {
-	fmt.Println("running addspaces")
-	fmt.Println("top of the hour")
 	spaces, err := getSpaces()
-	fmt.Println(spaces)
 	if err != nil {
 		fmt.Println(err)
 	}
 	for _, space := range spaces.Spaces {
 		processSpace(space)
 	}
-	fmt.Println(limitlist)
 }
 
 func processSpace(space string) {
 
-	fmt.Println("processing " + space)
 	apps, err := getApps(space)
 	for _, app := range apps {
 		if app.Plan != "noplan" {
@@ -353,7 +345,6 @@ func postMemorySample(simplestat SimpleStat) {
 	if err != nil {
 		fmt.Println(err)
 	} else {
-		fmt.Println("message sent")
 	}
 
 }
@@ -410,18 +401,8 @@ func ByteFormat(inputNum float64, precision int) string {
 }
 
 func evaluateLimit(used float64, limit float64, simplestat SimpleStat) {
-	app := simplestat.ContainerName + "-" + simplestat.Namespace
-	fmt.Println("checking limit of " + app)
-	fmt.Println("current usage:")
-	fmt.Println(used)
-	fmt.Println("limit is:")
-	fmt.Println(limit)
 	limitbytes := limit * 1048576
-	fmt.Println("limit in bytes is:")
-	fmt.Println(limitbytes)
-	fmt.Println("percentage is:")
 	percentage := (used / limitbytes) * 100
-	fmt.Println(percentage)
 	if percentage > 80 && percentage < 90 {
 		fmt.Println("limit warning")
 		injectMemoryAlert("warning", simplestat, limit)
@@ -442,9 +423,6 @@ func injectMemoryAlert(alerttype string, simplestat SimpleStat, limit float64) {
 	valuestring := ByteFormat(f, 0)
 	limitbytes := limit * 1048576
 	limitstring := ByteFormat(limitbytes, 0)
-	fmt.Println("Injecting Alert")
-	fmt.Println(simplestat.ContainerName + "-" + simplestat.Namespace)
-	fmt.Println(alerttype)
 	var logentry Logspec
 	if alerttype == "warning" {
 		logentry.Log = "[alert] dyno=" + simplestat.PodName + " Error R14 (Memory limit warning) " + valuestring + "/" + limitstring
@@ -459,8 +437,6 @@ func injectMemoryAlert(alerttype string, simplestat SimpleStat, limit float64) {
 	logentry.Kubernetes.Labels.Name = simplestat.ContainerName
 	logentry.Topic = simplestat.Namespace
 	logentry.Tag = "metrics"
-	fmt.Println(logentry.Log)
-	fmt.Println("**************** send log *****************")
 	str, err := json.Marshal(logentry)
 	if err != nil {
 		fmt.Println("Error preparing request")
@@ -468,7 +444,6 @@ func injectMemoryAlert(alerttype string, simplestat SimpleStat, limit float64) {
 	}
 	jsonStr := string(str)
 
-	fmt.Println(jsonStr)
 	msg := &sarama.ProducerMessage{Topic: logentry.Topic, Value: sarama.StringEncoder(jsonStr)}
 
 	_, _, err = producer.SendMessage(msg)
