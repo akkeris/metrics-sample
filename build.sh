@@ -1,9 +1,7 @@
 #!/bin/sh
 
 cd /go/src
-go get "github.com/stackimpact/stackimpact-go"
-go get "gopkg.in/Shopify/sarama.v1"
-go get "github.com/akkeris/vault-client"
+go get "gopkg.in/shopify/sarama.v1"
 cd /go/src/metrics-sample
 go build metrics-sample.go
 

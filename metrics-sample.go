@@ -3,8 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	vault "github.com/akkeris/vault-client"
-	"gopkg.in/Shopify/sarama.v1"
+	"gopkg.in/shopify/sarama.v1"
 	"io/ioutil"
 	"math"
 	"net/http"
@@ -482,7 +481,7 @@ func injectMemoryAlert(alerttype string, simplestat SimpleStat, limit float64) {
 
 func setCreds() {
 
-	alamoapiusername = vault.GetField("secret/ops/alamo/api", "username")
-	alamoapipassword = vault.GetField("secret/ops/alamo/api", "password")
+	alamoapiusername = os.Getenv("ALAMO_USERNAME")
+	alamoapipassword = os.Getenv("ALAMO_PASSWORD")
 
 }
