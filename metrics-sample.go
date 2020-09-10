@@ -33,8 +33,8 @@ type Plan struct {
 }
 
 type SimpleStat struct {
-	PodName         string `json:"pod_name"`
-	ContainerName   string `json:"container_name"`
+	PodName         string `json:"pod"`
+	ContainerName   string `json:"container"`
 	Namespace       string `json:"namespace"`
 	MemoryTotal     string `json:"memory_total_s"`
 	MemoryRSS       string `json:"memory_rss_s"`
@@ -49,9 +49,9 @@ type PromStat struct {
 		ResultType string `json:"resultType"`
 		Result     []struct {
 			Metric struct {
-				ContainerName string `json:"container_name"`
+				ContainerName string `json:"container"`
 				Namespace     string `json:"namespace"`
-				PodName       string `json:"pod_name"`
+				PodName       string `json:"pod"`
 			} `json:"metric"`
 			Value []interface{} `json:"value"`
 		} `json:"result"`
@@ -268,7 +268,7 @@ func getMetrics() {
 func addIn(metrics map[string]SimpleStat, fieldname string, metric string) map[string]SimpleStat {
 	client := http.Client{}
 	prometheusurl := os.Getenv("PROMETHEUS_URL")
-	req, err := http.NewRequest("GET", prometheusurl+"/api/v1/query?query=sum+by(pod_name,namespace,container_name)("+metric+"{container_name!=\"POD\",container_name!=\"\",namespace!=\"kube-system\",job=\"kubernetes-nodes-cadvisor\"})", nil)
+	req, err := http.NewRequest("GET", prometheusurl+"/api/v1/query?query=sum+by(pod,namespace,container)("+metric+"{container!=\"POD\",container!=\"\",namespace!=\"kube-system\",job=\"kubernetes-nodes-cadvisor\"})", nil)
 	if err != nil {
 		fmt.Println("error creating request")
 		return nil
