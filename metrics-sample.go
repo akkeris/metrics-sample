@@ -112,20 +112,19 @@ func main() {
 	limitlist = make(map[string]float64)
 	planlimits = make(map[string]float64)
 	setCreds()
-	populatePlanLimits()
-	populateLimits()
-	getMetrics()
 	delay, err := strconv.Atoi(os.Getenv("DELAY_MINUTES"))
 	if err != nil {
 		fmt.Println(err)
 		fmt.Println("no delay set")
 		os.Exit(1)
 	}
-	for i := 1; i <= 6; i++ {
-		time.Sleep(time.Duration(delay) * time.Minute)
+	for loop := true; loop; loop = true {
+		populatePlanLimits()
+		populateLimits()
 		getMetrics()
+		time.Sleep(time.Duration(delay) * time.Minute)
 	}
-	fmt.Println("done")
+	fmt.Println("this should never happen")
 }
 
 func populatePlanLimits() {
